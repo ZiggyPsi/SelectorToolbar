@@ -109,6 +109,14 @@ def onStyle():
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
 
 
+def onIconSize():
+    """Set custom icon size if enabled"""
+    if p.GetBool("IconSizeEnabled") and p.GetInt("IconSize") > 0:
+        tb.setIconSize(QtCore.QSize(p.GetInt("IconSize"), p.GetInt("IconSize")))
+    else:
+        tb.setIconSize(QtCore.QSize())
+
+
 def selectorMenu():
     """Selector button with menu."""
     sMenu.clear()
@@ -240,10 +248,17 @@ def prefDialog():
     r6.setToolTip("Selector menu at end")
     c1 = QtGui.QCheckBox("Static")
     c1.setToolTip("Do not adapt selector menu to active workbench")
+    c2 = QtGui.QCheckBox("Icon Size")
+    c2.setToolTip("Enable custom icon size")
+    s1 = QtGui.QSpinBox()
+    s1.setToolTip("Enter icon size")
+    s1.setRange(0, 128)
     l1.addWidget(r4)
     l1.addWidget(r5)
     l1.addWidget(r6)
     l1.addWidget(c1)
+    l1.addWidget(c2)
+    l1.addWidget(s1)
     l2 = QtGui.QHBoxLayout()
     l2.addWidget(btnUp)
     l2.addWidget(btnDown)
@@ -358,6 +373,21 @@ def prefDialog():
             p.SetBool("Static", 0)
         onWorkbenchActivated()
 
+    def onC2(c):
+        """Manage custom icon size."""
+        if c:
+            p.SetBool("IconSizeEnabled", 1)
+        else:
+            p.SetBool("IconSizeEnabled", 0)
+        onIconSize()
+        onWorkbenchActivated()
+
+    def onS1(s):
+        p.SetInt("IconSize", s1.value())
+        onIconSize()
+        onWorkbenchActivated()
+
+
     enabled = p.GetString("Enabled", dList)
     unchecked = p.GetString("Unchecked")
     position = p.GetString("Position")
@@ -404,6 +434,12 @@ def prefDialog():
     static = p.GetBool("Static", 0)
     if static:
         c1.setChecked(True)
+    iconsizebool = p.GetBool("IconSizeEnabled", 0)
+    if iconsizebool:
+        c2.setChecked(True)
+    iconsize = p.GetInt("IconSize")
+    if iconsize:
+        s1.setValue(iconsize)
     r0.toggled.connect(onG0)
     r1.toggled.connect(onG0)
     r2.toggled.connect(onG0)
@@ -412,6 +448,8 @@ def prefDialog():
     r5.toggled.connect(onG1)
     r6.toggled.connect(onG1)
     c1.stateChanged.connect(onC1)
+    c2.stateChanged.connect(onC2)
+    s1.valueChanged.connect(onS1)
     btnUp.clicked.connect(onUp)
     btnDown.clicked.connect(onDown)
     selector.itemChanged.connect(onItemChanged)
@@ -480,6 +518,7 @@ def onStart():
         t.stop()
         t.deleteLater()
         onStyle()
+        onIconSize()
         accessoriesMenu()
         onWorkbenchActivated()
         group.triggered.connect(onSelector)
