@@ -195,6 +195,7 @@ def onWorkbenchActivated():
         w.setPopupMode(QtGui.QToolButton
                        .ToolButtonPopupMode
                        .InstantPopup)
+    onIconSize()
 
 
 def prefDialog():
@@ -539,3 +540,4 @@ def onPreStart():
 t = QtCore.QTimer()
 t.timeout.connect(onPreStart)
 t.start(500)
+
